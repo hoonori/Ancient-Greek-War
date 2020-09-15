@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: caa91560d16f445deb20725c0430b615
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - InfantryPrefab: {instanceID: 0}
+  - MusketeerPrefab: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
