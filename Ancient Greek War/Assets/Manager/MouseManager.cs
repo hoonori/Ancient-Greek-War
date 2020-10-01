@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class MouseManager : MonoBehaviour
 {
-    public GameObject userInputManager;
+    public GameObject userInterfaceManager;
 
-    private bool isActive = true;
+    private bool isActive = false;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +23,7 @@ public class MouseManager : MonoBehaviour
 
             int[] currGrid = ConvertCoordianteToGrid(position.x, position.y);
 
-            userInputManager.SendMessage("getMouseInput", currGrid[0].ToString() + "," + currGrid[1].ToString());
+            userInterfaceManager.SendMessage("getMouseInput", currGrid[0].ToString() + "," + currGrid[1].ToString());
         }        
     }
 

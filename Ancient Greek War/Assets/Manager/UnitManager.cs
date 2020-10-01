@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,6 +29,7 @@ public class UnitManager : MonoBehaviour
         int gridY = System.Convert.ToInt32(inputs[1]);
         int gridIndex = System.Convert.ToInt32(inputs[2]);
         string unitType = inputs[3];
+        int property = System.Convert.ToInt32(inputs[4]);
 
         int xOffset = 0;
         int yOffset = 0;
@@ -70,14 +72,59 @@ public class UnitManager : MonoBehaviour
         float targetX = 2.5f * (float)gridX + 0.625f * xOffset;
         float targetY = 2.5f * (float)gridY + 0.625f * yOffset;
 
+        GameObject newObject;
+
         switch(unitType)
         {
             case "Infantry":
-            Instantiate(InfantryPrefab, new Vector3(targetX, targetY, -1), Quaternion.identity);
-            break;
+                {
+                    newObject = Instantiate(InfantryPrefab, new Vector3(targetX, targetY, -1), Quaternion.identity);
+                    break;
+                }
             case "Musketeer":
-            Instantiate(MusketeerPrefab, new Vector3(targetX, targetY, -1), Quaternion.identity);
-            break;
+                {
+                    newObject = Instantiate(MusketeerPrefab, new Vector3(targetX, targetY, -1), Quaternion.identity);
+                    break;
+                }
+            default:
+                {
+                    newObject = Instantiate(InfantryPrefab, new Vector3(targetX, targetY, -1), Quaternion.identity);
+                    break;
+                }
+        }
+
+        switch(property)
+        {
+            case 1:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.red;
+                    break;
+                }
+            case 2:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.blue;
+                    break;
+                }
+            case 3:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.yellow;
+                    break;
+                }
+            case 4:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.green;
+                    break;
+                }
+            case 5:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.white;
+                    break;
+                }
+            case 6:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.black;
+                    break;
+                }
         }
     }
 

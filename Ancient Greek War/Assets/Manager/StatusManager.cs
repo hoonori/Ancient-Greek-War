@@ -20,15 +20,12 @@ public class StatusManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        currGold += 1;
-
-        if (currGold >= 1000)
-        {
-            currTurn += 1;
-            currGold -= 1000;
-        }
-
         statusGold.text = "Gold : " + currGold.ToString();
         statusTurn.text = "Turn : " + currTurn.ToString();
+    }
+
+    void ChangeTurn()
+    {
+
     }
 }

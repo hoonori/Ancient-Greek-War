@@ -24,13 +24,17 @@ public class Tester : MonoBehaviour
         buildingManager = GameObject.Find("BuildingManager");
         userInputManager = GameObject.Find("UserInputManager");
 
-        currX = 3;
-        currY = 3;
-        currIndex = 0;
-        currType = "Infantry";
+        // currX = 3;
+        // currY = 3;
+        // currIndex = 0;
+        // currType = "Infantry";
 
-        unitManager.SendMessage("CreateUnit", currX.ToString() + "," + currY.ToString() + "," + currIndex.ToString() + "," + currType);
-        buildingManager.SendMessage("CreateBuilding", "1,1,Temple");
+        // unitManager.SendMessage("CreateUnit", currX.ToString() + "," + currY.ToString() + "," + currIndex.ToString() + "," + currType);
+        // buildingManager.SendMessage("CreateBuilding", "1,1,Temple");
+        // unitManager.SendMessage("MoveUnit", "3,3,0,1,1,0");
+        // tileManager.SendMessage("ChangeTile", "0,0,Water");
+        // unitManager.SendMessage("DestroyUnit", "1,1,0");
+        // buildingManager.SendMessage("DestroyBuilding", "1,1");
     }
 
     // Update is called once per frame
@@ -38,41 +42,33 @@ public class Tester : MonoBehaviour
     {
 
         if (sequence == 0 && !isSequenceDone[sequence]) {
-
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 1 && !isSequenceDone[sequence]) {
-            unitManager.SendMessage("MoveUnit", "3,3,0,1,1,0");
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 2 && !isSequenceDone[sequence]) {
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 3 && !isSequenceDone[sequence]) {
-            tileManager.SendMessage("ChangeTile", "0,0,Water");
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 4 && !isSequenceDone[sequence]) {
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 5 && !isSequenceDone[sequence]) {
-
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 6 && !isSequenceDone[sequence]) {
-            unitManager.SendMessage("DestroyUnit", "1,1,0");
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 7 && !isSequenceDone[sequence]) {
-            buildingManager.SendMessage("DestroyBuilding", "1,1");
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 8 && !isSequenceDone[sequence]) {
-
             isSequenceDone[sequence] = true;
         }
         else if (sequence == 9 && !isSequenceDone[sequence]) {
-
             isSequenceDone[sequence] = true;
         }
         else {

@@ -23,6 +23,7 @@ public class TileManager : MonoBehaviour
         
     }
     
+    // Input should be "x,y,type" where x and y being grid and type being terrain type.
     public void ChangeTile(string input)
     {
         string[] inputs = input.Split(',');

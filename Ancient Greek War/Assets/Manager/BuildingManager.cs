@@ -46,15 +46,60 @@ public class BuildingManager : MonoBehaviour
         int gridX = System.Convert.ToInt32(inputs[0]);
         int gridY = System.Convert.ToInt32(inputs[1]);
         string buildingType = inputs[2];
+        int property = System.Convert.ToInt32(inputs[3]);
 
         float targetX = 2.5f * (float)gridX + 1.25f;
         float targetY = 2.5f * (float)gridY + 1.25f;
 
+        GameObject newObject;
+
         switch(buildingType)
         {
+            case "Polis":
             case "Temple":
-            Instantiate(TemplePrefab, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
-            break;
+                {
+                    newObject = Instantiate(TemplePrefab, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    break;
+                }
+            default:
+                {
+                    newObject = Instantiate(TemplePrefab, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    break;
+                }
+        }
+
+        switch (property)
+        {
+            case 1:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.red;
+                    break;
+                }
+            case 2:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.blue;
+                    break;
+                }
+            case 3:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.yellow;
+                    break;
+                }
+            case 4:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.green;
+                    break;
+                }
+            case 5:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.white;
+                    break;
+                }
+            case 6:
+                {
+                    newObject.GetComponent<Renderer>().material.color = Color.black;
+                    break;
+                }
         }
     }
 

@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 3394353746174521894}
   - component: {fileID: 9216068160547316672}
   m_Layer: 0
-  m_Name: Infantry 1
+  m_Name: Infantry
   m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -174,6 +174,7 @@ MonoBehaviour:
   targetX: 0
   targetY: 0
   health: 0
+  healthBar: {fileID: 0}
 --- !u!1 &6840302071959300465
 GameObject:
   m_ObjectHideFlags: 0

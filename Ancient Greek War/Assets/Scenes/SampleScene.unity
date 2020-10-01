@@ -866,7 +866,7 @@ GameObject:
   - component: {fileID: 829982106}
   - component: {fileID: 829982107}
   m_Layer: 0
-  m_Name: MouseManager
+  m_Name: InputManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -898,7 +898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a09bf9e1e5df43e4e92e44063d81a486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  userInputManager: {fileID: 1789695292}
+  userInterfaceManager: {fileID: 0}
 --- !u!1 &901749434
 GameObject:
   m_ObjectHideFlags: 0
@@ -1048,6 +1048,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardSize: 7
   turn: 0
+  boardManager: {fileID: 1172269435}
+  userInterfaceManager: {fileID: 1789695292}
 --- !u!1 &1172269435
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,6 +1098,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileManager: {fileID: 653897899}
   unitManager: {fileID: 502891711}
+  buildingManager: {fileID: 541428211}
 --- !u!1 &1250269797
 GameObject:
   m_ObjectHideFlags: 0
@@ -2104,7 +2107,7 @@ GameObject:
   - component: {fileID: 1789695293}
   - component: {fileID: 1789695294}
   m_Layer: 0
-  m_Name: UserInputManager
+  m_Name: UserInterfaceManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2142,6 +2145,7 @@ MonoBehaviour:
   gameManager: {fileID: 904674099}
   mouseManager: {fileID: 829982105}
   buttonManager: {fileID: 253853461}
+  statusManager: {fileID: 0}
 --- !u!1 &2001719061
 GameObject:
   m_ObjectHideFlags: 0
