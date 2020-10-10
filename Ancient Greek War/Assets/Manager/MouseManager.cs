@@ -23,7 +23,7 @@ public class MouseManager : MonoBehaviour
 
             int[] currGrid = ConvertCoordianteToGrid(position.x, position.y);
 
-            userInterfaceManager.SendMessage("getMouseInput", currGrid[0].ToString() + "," + currGrid[1].ToString());
+            userInterfaceManager.SendMessage("GetMouseInput", currGrid[0].ToString() + "," + currGrid[1].ToString());
         }        
     }
 

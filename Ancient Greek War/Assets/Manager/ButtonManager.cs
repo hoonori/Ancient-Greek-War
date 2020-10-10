@@ -1,20 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ButtonManager : MonoBehaviour
 {
+    public GameObject userInterfaceManager;
+
     public GameObject abilityButton;
+    public GameObject abilityMoveUnit;
+    public GameObject abilityChangeTile;
+
     public GameObject buildButton;
+    public GameObject buildPolis;
+    public GameObject buildTemple;
+
     public GameObject extraButton;
 
     // Start is called before the first frame update
     void Start()
     {
-        abilityButton = GameObject.Find("AbilityButton");
-        buildButton = GameObject.Find("BuildButton");
-        extraButton = GameObject.Find("ExtraButton");
+        abilityMoveUnit.SetActive(false);
+        abilityChangeTile.SetActive(false);
+
+        buildPolis.SetActive(false);
+        buildTemple.SetActive(false);
     }
 
     // Update is called once per frame
@@ -53,5 +64,71 @@ public class ButtonManager : MonoBehaviour
                 extraButton.GetComponent<Button>().interactable = false;
                 break;
         }
+    }
+
+    public void Appear()
+    {
+        abilityButton.SetActive(true);
+        buildButton.SetActive(true);
+        extraButton.SetActive(true);
+    }
+
+    public void Disappear()
+    {
+        abilityButton.SetActive(false);
+        buildButton.SetActive(false);
+        extraButton.SetActive(false);
+    }
+
+    public void AbilityButton()
+    {
+        Disappear();
+
+        abilityMoveUnit.SetActive(true);
+        abilityChangeTile.SetActive(true);
+    }
+
+    public void AbilityMoveUnit()
+    {
+
+    }
+
+    public void AbilityChangeTile()
+    {
+
+    }
+
+    public void BuildButton()
+    {
+        Disappear();
+
+        buildPolis.SetActive(true);
+        buildTemple.SetActive(true);
+    }
+
+    public void BuildPolis()
+    {
+        userInterfaceManager.SendMessage("BuildButton", "Polis");
+
+        buildPolis.SetActive(false);
+        buildTemple.SetActive(false);
+
+        Appear();
+    }
+
+    public void BuildTemple()
+    {
+        userInterfaceManager.SendMessage("BuildButton", "Temple");
+
+        buildPolis.SetActive(false);
+        buildTemple.SetActive(false);
+
+        Appear();
+    }
+
+    public void ExtraButton()
+    {
+        Disappear();
+
     }
 }

@@ -8,16 +8,14 @@ public class UnitScript : MonoBehaviour
     public float actualX, actualY;
     public float targetX, targetY;
 
-    public int health;
+    public float actualHealth;
+    public float targetHealth;
     public Image healthBar;
 
     // Start is called before the first frame update   
     void Start()
     {
         Vector3 currPosition = transform.position;
-
-        health = 100;
-        healthBar = GameObject.Find("HealthBar").GetComponent<Image>();
 
         actualX = currPosition[0];
         actualY = currPosition[1];
@@ -28,6 +26,13 @@ public class UnitScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        healthBar.fillAmount = actualHealth;
+        
+        if ((targetHealth - actualHealth) <= -0.0625f || (targetHealth - actualHealth) >= 0.0625f)
+        {
+            actualHealth += targetHealth > actualHealth ? 0.0625f : -0.0625f;
+        }
+
         if ((targetX - actualX) <= -0.0625f || (targetX - actualX) >= 0.0625f)
         {
             actualX += targetX > actualX ? 0.0625f : -0.0625f;
@@ -38,8 +43,6 @@ public class UnitScript : MonoBehaviour
         }
 
         transform.position = new Vector3(actualX, actualY, -1);
-
-        healthBar.fillAmount = health / 100f;
     }
     
     public void Move(string input)
@@ -77,6 +80,6 @@ public class UnitScript : MonoBehaviour
 
     public void SetHealth(string input)
     {
-        health = System.Convert.ToInt32(input);
+        targetHealth = (float) System.Convert.ToSingle(input);
     }
 }

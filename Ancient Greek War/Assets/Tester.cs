@@ -30,11 +30,11 @@ public class Tester : MonoBehaviour
         // currType = "Infantry";
 
         // unitManager.SendMessage("CreateUnit", currX.ToString() + "," + currY.ToString() + "," + currIndex.ToString() + "," + currType);
-        // buildingManager.SendMessage("CreateBuilding", "1,1,Temple");
+        // buildingManager.SendMessage("CreateBuilding", "5,5,Temple");
         // unitManager.SendMessage("MoveUnit", "3,3,0,1,1,0");
         // tileManager.SendMessage("ChangeTile", "0,0,Water");
         // unitManager.SendMessage("DestroyUnit", "1,1,0");
-        // buildingManager.SendMessage("DestroyBuilding", "1,1");
+        // buildingManager.SendMessage("DestroyBuilding", "0,6");
     }
 
     // Update is called once per frame
@@ -43,6 +43,7 @@ public class Tester : MonoBehaviour
 
         if (sequence == 0 && !isSequenceDone[sequence]) {
             isSequenceDone[sequence] = true;
+            // buildingManager.SendMessage("CreateBuilding", "5,5,Temple,6");
         }
         else if (sequence == 1 && !isSequenceDone[sequence]) {
             isSequenceDone[sequence] = true;
@@ -52,6 +53,7 @@ public class Tester : MonoBehaviour
         }
         else if (sequence == 3 && !isSequenceDone[sequence]) {
             isSequenceDone[sequence] = true;
+            // buildingManager.SendMessage("DestroyBuilding", "5,5");
         }
         else if (sequence == 4 && !isSequenceDone[sequence]) {
             isSequenceDone[sequence] = true;

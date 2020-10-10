@@ -174,7 +174,7 @@ MonoBehaviour:
   targetX: 0
   targetY: 0
   health: 0
-  healthBar: {fileID: 0}
+  healthBar: {fileID: 2344966675015456687}
 --- !u!1 &6840302071959300465
 GameObject:
   m_ObjectHideFlags: 0

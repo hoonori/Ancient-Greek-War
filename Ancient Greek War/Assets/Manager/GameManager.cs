@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     public int turn;
 
     public GameTile[][] board;
-    
+
     public GameObject boardManager;
     public GameObject userInterfaceManager;
 
@@ -20,8 +20,11 @@ public class GameManager : MonoBehaviour
     public Dictionary<string, int> unitDictionary;
 
     float timer = 0;
-    int currSeq = 0;
+    int currSeq = 1;
     int prevSeq = 0;
+    int playerA = 5;
+    bool isButtonActive = false;
+
 
     void InitBoard()
     {
@@ -43,7 +46,7 @@ public class GameManager : MonoBehaviour
 
                 board[i][j].units = new GameUnit[20];
                 board[i][j].unitCount = 0;
-                
+
                 board[i][j].distance = new int[7];
                 board[i][j].direction = new string[7];
             }
@@ -71,7 +74,7 @@ public class GameManager : MonoBehaviour
             {'G','G','G','G','G','G','G'},
             {'M','M','G','G','G','G','G'},
             {'G','G','G','G','G','G','G'},
-            {'G','G','W','G','G','G','G'},
+            {'G','G','G','G','G','G','G'},
             {'G','G','W','G','G','G','G'},
             {'G','G','W','G','G','G','G'}
         };
@@ -97,8 +100,8 @@ public class GameManager : MonoBehaviour
                         break;
                 }
 
-                board[j][6-i].terrain = currTerrain;
-                boardManager.SendMessage("ChangeTile", i.ToString() + "," + (6-j).ToString() + "," + currTerrain);
+                board[i][6 - j].terrain = currTerrain;
+                boardManager.SendMessage("ChangeTile", i.ToString() + "," + (6 - j).ToString() + "," + currTerrain);
             }
         }
 
@@ -109,13 +112,27 @@ public class GameManager : MonoBehaviour
         board[2][2].structure.generate = "Infantry";
         board[2][2].structure.counter = 1;
         board[2][2].isBuilt = true;
-        
+
         board[4][4].property = 4;
         board[4][4].structure.property = 4;
         board[4][4].structure.buildingType = "Polis";
         board[4][4].structure.generate = "Musketeer";
         board[4][4].structure.counter = 1;
         board[4][4].isBuilt = true;
+
+        for (int i = 0; i < boardSize; i++)
+        {
+            for (int j = 0; j < boardSize; j++)
+            {
+                for (int k = 0; k < board[i][j].unitCount; k++)
+                {
+                    boardManager.SendMessage("CreateUnit", i.ToString() + "," + j.ToString() + "," + k.ToString() + "," + board[i][j].units[k].unitType + "," + board[i][j].units[k].property);
+                }
+
+                if (board[i][j].isBuilt)
+                    boardManager.SendMessage("CreateBuilding", i.ToString() + "," + j.ToString() + "," + board[i][j].structure.buildingType + "," + board[i][j].property);
+            }
+        }
     }
 
     void UpdateBoard()
@@ -132,7 +149,7 @@ public class GameManager : MonoBehaviour
                 }
 
                 if (board[i][j].isBuilt)
-                    boardManager.SendMessage("DestoryBuilding", i.ToString() + "," + j.ToString());
+                    boardManager.SendMessage("DestroyBuilding", i.ToString() + "," + j.ToString());
             }
         }
 
@@ -159,12 +176,26 @@ public class GameManager : MonoBehaviour
                 for (int k = 0; k < board[i][j].unitCount; k++)
                 {
                     boardManager.SendMessage("CreateUnit", i.ToString() + "," + j.ToString() + "," + k.ToString() + "," + board[i][j].units[k].unitType + "," + board[i][j].units[k].property);
+                    boardManager.SendMessage("SetUnitHealth", i.ToString() + "," + j.ToString() + "," + k.ToString() + "," + ((float)board[i][j].units[k].currentHP / 2 / (float)board[i][j].units[k].unitHP));
                 }
 
                 if (board[i][j].isBuilt)
                     boardManager.SendMessage("CreateBuilding", i.ToString() + "," + j.ToString() + "," + board[i][j].structure.buildingType + "," + board[i][j].property);
             }
         }
+    }
+
+    //added 10/10
+    bool moveable(int i, int j)
+    {
+        //tile is movable if it is not Mountain or Water
+        if (board[i][j].terrain == "Water" || board[i][j].terrain == "Mountain")
+        {
+            //UnityEngine.Debug.Log(i.ToString() + "," + j.ToString() + ", " + board[i][j].terrain + "is not walkable");
+            return false;
+        }
+
+        return true;
     }
 
     void UpdateLookupTable(int targetProperty)
@@ -186,32 +217,32 @@ public class GameManager : MonoBehaviour
             {
                 int property = board[i][j].property;
 
-                if (property != targetProperty)
+                if (property != targetProperty || !moveable(i, j))
                     continue;
 
                 // Up
-                if (j < boardSize - 1 && property != board[i][j + 1].property)
+                if (j < boardSize - 1 && property != board[i][j + 1].property && moveable(i, j + 1))
                 {
                     board[i][j].distance[targetProperty] = 1;
                     board[i][j].direction[targetProperty] += "U";
                 }
 
                 // Down
-                if (j > 0 && property != board[i][j - 1].property)
+                if (j > 0 && property != board[i][j - 1].property && moveable(i, j - 1))
                 {
                     board[i][j].distance[targetProperty] = 1;
                     board[i][j].direction[targetProperty] += "D";
                 }
 
                 // Left
-                if (i > 0 && property != board[i - 1][j].property)
+                if (i > 0 && property != board[i - 1][j].property && moveable(i - 1, j))
                 {
                     board[i][j].distance[targetProperty] = 1;
                     board[i][j].direction[targetProperty] += "L";
                 }
 
                 // Right
-                if (i < boardSize - 1 && property != board[i + 1][j].property)
+                if (i < boardSize - 1 && property != board[i + 1][j].property && moveable(i + 1, j))
                 {
                     board[i][j].distance[targetProperty] = 1;
                     board[i][j].direction[targetProperty] += "R";
@@ -231,12 +262,12 @@ public class GameManager : MonoBehaviour
                 {
                     int property = board[i][j].property;
 
-                    if (property == targetProperty && board[i][j].distance[targetProperty] == 0)
+                    if (property == targetProperty && board[i][j].distance[targetProperty] == 0 && moveable(i, j))
                     {
-                        int minDistance = 15;
+                        int minDistance = 35;
                         // Check 4 directions to find out the shortest, then determine the way.
                         // Up
-                        if (j < 6 && board[i][j + 1].distance[targetProperty] != 0)
+                        if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
                         {
                             if (minDistance == board[i][j + 1].distance[targetProperty])
                             {
@@ -262,7 +293,7 @@ public class GameManager : MonoBehaviour
                             }
                         }
                         // Right
-                        if (i < 6 && board[i + 1][j].distance[targetProperty] != 0)
+                        if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
                         {
                             if (minDistance == board[i + 1][j].distance[targetProperty])
                             {
@@ -289,7 +320,7 @@ public class GameManager : MonoBehaviour
                         }
 
                         // Update distance
-                        if (minDistance != 15)
+                        if (minDistance != 35)
                         {
                             board[i][j].distance[targetProperty] = minDistance + 1;
                             changeCount++;
@@ -311,13 +342,13 @@ public class GameManager : MonoBehaviour
                 {
                     int property = board[i][j].property;
 
-                    if (property != targetProperty && board[i][j].distance[targetProperty] == 0)
+                    if (property != targetProperty && board[i][j].distance[targetProperty] == 0 && moveable(i, j))
                     {
-                        int maxDistance = -15;
+                        int maxDistance = -35;
 
                         // Check 4 directions to find out the shortest, then determine the way.
                         // Up
-                        if (j < 6 && board[i][j + 1].distance[targetProperty] != 0)
+                        if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
                         {
                             if (maxDistance == board[i][j + 1].distance[targetProperty])
                             {
@@ -343,7 +374,7 @@ public class GameManager : MonoBehaviour
                             }
                         }
                         // Right
-                        if (i < 6 && board[i + 1][j].distance[targetProperty] != 0)
+                        if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
                         {
                             if (maxDistance == board[i + 1][j].distance[targetProperty])
                             {
@@ -370,7 +401,7 @@ public class GameManager : MonoBehaviour
                         }
 
                         // Update distance
-                        if (maxDistance != -15)
+                        if (maxDistance != -35)
                         {
                             if (maxDistance == 1)
                             {
@@ -399,7 +430,7 @@ public class GameManager : MonoBehaviour
                 if (property != targetProperty)
                 {
                     // Check minDistance tiles around it and get the directions
-                    int minDistance = 15;
+                    int minDistance = 35;
 
                     // Up
                     if (j < 6 && board[i][j + 1].distance[targetProperty] != 0)
@@ -461,7 +492,7 @@ public class GameManager : MonoBehaviour
     }
 
     void GenerateUnit()
-    {       
+    {
         for (int i = 0; i < boardSize; i++)
         {
             for (int j = 0; j < boardSize; j++)
@@ -542,31 +573,31 @@ public class GameManager : MonoBehaviour
                             if (unitMoved.property != targetProperty)
                                 continue;
 
-                            switch(board[i][j].direction[targetProperty][(dividend++) % divisor])
+                            switch (board[i][j].direction[targetProperty][(dividend++) % divisor])
                             {
                                 case 'U':
-                                    board[i][j+1].units[board[i][j+1].unitCount] = unitMoved;
-                                    board[i][j+1].unitCount++;
+                                    board[i][j + 1].units[board[i][j + 1].unitCount] = unitMoved;
+                                    board[i][j + 1].unitCount++;
                                     break;
                                 case 'D':
-                                    board[i][j-1].units[board[i][j-1].unitCount] = unitMoved;
-                                    board[i][j-1].unitCount++;
+                                    board[i][j - 1].units[board[i][j - 1].unitCount] = unitMoved;
+                                    board[i][j - 1].unitCount++;
                                     break;
                                 case 'L':
-                                    board[i-1][j].units[board[i-1][j].unitCount] = unitMoved;
-                                    board[i-1][j].unitCount++;
+                                    board[i - 1][j].units[board[i - 1][j].unitCount] = unitMoved;
+                                    board[i - 1][j].unitCount++;
                                     break;
                                 case 'R':
-                                    board[i+1][j].units[board[i+1][j].unitCount] = unitMoved;
-                                    board[i+1][j].unitCount++;
+                                    board[i + 1][j].units[board[i + 1][j].unitCount] = unitMoved;
+                                    board[i + 1][j].unitCount++;
                                     break;
                             }
 
-                            for (int k = u+1; k < board[i][j].unitCount; k++)
+                            for (int k = u + 1; k < board[i][j].unitCount; k++)
                             {
                                 GameUnit unitNext = board[i][j].units[k];
 
-                                board[i][j].units[k-1] = unitNext;
+                                board[i][j].units[k - 1] = unitNext;
                             }
 
                             u -= 1;
@@ -787,9 +818,102 @@ public class GameManager : MonoBehaviour
         return;
     }
 
+    public void ButtonClicked(string input)
+    {
+        string[] inputs = input.Split(',');
+        string majorButton = inputs[0];
+        string minorButton = inputs[1];
+        int gridX, gridY;
+
+        int property = 1;
+        
+        switch(majorButton)
+        {
+            case "AbilityButton":
+                break;
+            case "BuildButton":
+                gridX = System.Convert.ToInt32(inputs[2]);
+                gridY = System.Convert.ToInt32(inputs[3]);
+
+                board[gridX][gridY].property = property;
+                board[gridX][gridY].structure.property = property;
+                board[gridX][gridY].structure.buildingType = minorButton;
+                board[gridX][gridY].structure.generate = "Musketeer";
+                board[gridX][gridY].structure.counter = 1;
+                board[gridX][gridY].isBuilt = true;
+
+                break;
+        }
+
+        // Deactivate button
+        isButtonActive = false;
+
+        // SendMessage()
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        initInfantry.property = 0;
+        initInfantry.unitType = "Infantry";
+        initInfantry.damage = 2;
+        initInfantry.range = 1;
+        initInfantry.unitHP = 10;
+        initInfantry.currentHP = 10;
+
+        initMusketeer.property = 0;
+        initMusketeer.unitType = "Musketeer";
+        initMusketeer.damage = 3;
+        initMusketeer.range = 2;
+        initMusketeer.unitHP = 5;
+        initMusketeer.currentHP = 5;
+
+        unitDictionary = new Dictionary<string, int>()
+        {
+            {"Infantry", 2},
+            {"Musketeer", 3}
+        };
+
+        InitBoard();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        timer += Time.deltaTime;
+
+        if (!(playerA > currSeq))
+        {
+            if (isButtonActive == false)
+            {
+                // Activate button at UIManager
+
+                // SendMessage()
+
+                isButtonActive = true;
+            }
+            timer = 0;
+        }
+        else
+        {
+            if (currSeq != prevSeq)
+            {
+                UpdateBoard();
+                prevSeq = currSeq;
+                userInterfaceManager.SendMessage("SetTurn", currSeq.ToString());
+            }
+
+            if (timer >= 1)
+            {
+                currSeq += 1;
+                timer = 0;
+            }
+        }
+    }
+
     void PrintDebug(string which, int who)
     {
-        switch(which)
+        switch (which)
         {
             case "distance":
                 {
@@ -840,59 +964,6 @@ public class GameManager : MonoBehaviour
                     break;
                 }
         }
-    }
-
-    void MoveUnit()
-    {
-
-    }
-
-    void ChangeTile()
-    {
-
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        initInfantry.property = 0;
-        initInfantry.unitType = "Infantry";
-        initInfantry.damage = 2;
-        initInfantry.range = 1;
-        initInfantry.unitHP = 10;
-        initInfantry.currentHP = 10;
-
-        initMusketeer.property = 0;
-        initMusketeer.unitType = "Musketeer";
-        initMusketeer.damage = 3;
-        initMusketeer.range = 2;
-        initMusketeer.unitHP = 5;
-        initMusketeer.currentHP = 5;
-
-        unitDictionary = new Dictionary<string, int>()
-        {
-            {"Infantry", 2},
-            {"Musketeer", 3}
-        };
-
-        InitBoard();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (currSeq != prevSeq)
-        {
-            UpdateBoard();
-            prevSeq = currSeq;
-        }
-
-        if (timer >= 1)
-        {
-            currSeq += 1;
-            timer = 0;
-        }
-        timer += Time.deltaTime;
     }
 }
 

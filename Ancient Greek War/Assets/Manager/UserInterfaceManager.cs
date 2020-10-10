@@ -8,6 +8,8 @@ public class UserInterfaceManager : MonoBehaviour
 
     int currGridX, currGridY;
 
+    string majorButton, minorButton;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,11 +22,43 @@ public class UserInterfaceManager : MonoBehaviour
 
     }
 
+    public void AbilityButton(string input)
+    {
+        majorButton = "AbilityButton";
+        minorButton = input;
+
+        TurnOnMouseInput();
+    }
+
+    public void BuildButton(string input)
+    {
+        majorButton = "BuildButton";
+        minorButton = input;
+
+        TurnOnMouseInput();
+    }
+
+    public void ExtraButton(string input)
+    {
+
+    }
+
     public void GetMouseInput(string input)
     {
         string[] inputs = input.Split(',');
         currGridX = System.Convert.ToInt32(inputs[0]);
         currGridY = System.Convert.ToInt32(inputs[1]);
+
+        switch (majorButton)
+        {
+            case "AbilityButton":
+                break;
+            case "BuildButton":
+                gameManager.SendMessage("ButtonClicked", majorButton + "," + minorButton + "," + currGridX.ToString() + "," + currGridY.ToString());
+                break;
+        }
+        
+        TurnOffMouseInput();
     }
 
     public GameObject mouseManager;
@@ -49,5 +83,10 @@ public class UserInterfaceManager : MonoBehaviour
     public void TurnOffButtonInput(string input)
     {
         buttonManager.SendMessage("TurnOff", input);
+    }
+
+    public void SetTurn(string input)
+    {
+        statusManager.SendMessage("SetTurn", input);
     }
 }

@@ -24,8 +24,8 @@ public class StatusManager : MonoBehaviour
         statusTurn.text = "Turn : " + currTurn.ToString();
     }
 
-    void ChangeTurn()
+    void SetTurn(string input)
     {
-
+        currTurn = System.Convert.ToInt32(input);
     }
 }

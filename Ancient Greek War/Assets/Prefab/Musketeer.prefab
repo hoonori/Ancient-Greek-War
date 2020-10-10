@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 3725569609073524640}
   - component: {fileID: 7640246164507279317}
   m_Layer: 0
-  m_Name: Musketeer 1
+  m_Name: Musketeer
   m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -273,3 +273,4 @@ MonoBehaviour:
   targetX: 0
   targetY: 0
   health: 0
+  healthBar: {fileID: 6732269786001129909}
