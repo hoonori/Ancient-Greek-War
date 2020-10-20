@@ -1,4 +1,4 @@
-# Ancient-Greek-War
+# Ancient-greek-war
 
 ## Team members
 
