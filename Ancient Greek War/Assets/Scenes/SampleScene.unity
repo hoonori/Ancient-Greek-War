@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 66363688}
   - component: {fileID: 66363687}
   m_Layer: 5
-  m_Name: ChangeTileButton
+  m_Name: ChangeWaterButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -262,7 +262,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 253853463}
-        m_MethodName: AbilityChangeTile
+        m_MethodName: AbilityChangeWater
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -500,7 +500,7 @@ MonoBehaviour:
   userInterfaceManager: {fileID: 1789695292}
   abilityButton: {fileID: 1779169647}
   abilityMoveUnit: {fileID: 1171795244}
-  abilityChangeTile: {fileID: 66363686}
+  abilityChangeWater: {fileID: 66363686}
   buildButton: {fileID: 460094813}
   buildPolis: {fileID: 747190962}
   buildTemple: {fileID: 1471589890}
@@ -3089,7 +3089,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uD0C0\uC77C \uBCC0\uACBD"
+  m_Text: "\uBB3C \uD0C0\uC77C\uB85C"
 --- !u!222 &2004094769
 CanvasRenderer:
   m_ObjectHideFlags: 0

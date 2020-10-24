@@ -18,12 +18,19 @@ public class GameManager : MonoBehaviour
     public GameUnit initMusketeer = new GameUnit();
 
     public Dictionary<string, int> unitDictionary;
+    public Dictionary<string, int> cooltimeDictionary;
 
     float timer = 0;
     int currSeq = 1;
     int prevSeq = 0;
+
     int playerA = 5;
+
     bool isButtonActive = false;
+
+    int moveUnitX = 0;
+    int moveUnitY = 0;
+    int moveUnitDuration = 0;
 
     void InitBoard()
     {
@@ -105,12 +112,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Then, place neutral units
-        board[2][2].property = 3;
-        board[2][2].structure.property = 3;
-        board[2][2].structure.buildingType = "Polis";
-        board[2][2].structure.generate = "Infantry";
-        board[2][2].structure.counter = 1;
-        board[2][2].isBuilt = true;
+        
 
         board[4][4].property = 4;
         board[4][4].structure.property = 4;
@@ -158,6 +160,7 @@ public class GameManager : MonoBehaviour
         UpdateLookupTable(4);
 
         GenerateUnit();
+        TerrainCheck();
 
         UpdateUnit(1);
         UpdateUnit(2);
@@ -184,11 +187,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //added 10/10
-    bool moveable(int i, int j)
+    bool isMovable(int i, int j)
     {
         //tile is movable if it is not Mountain or Water
-        if (board[i][j].terrain == "Water" || board[i][j].terrain == "Mountain")
+        if (board[i][j].terrain == "Water")
         {
             //UnityEngine.Debug.Log(i.ToString() + "," + j.ToString() + ", " + board[i][j].terrain + "is not walkable");
             return false;
@@ -209,64 +211,320 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // Then do the first iteration
-        for (int i = 0; i < boardSize; i++)
+        if (targetProperty == 1 && moveUnitDuration > 0)
         {
-            for (int j = 0; j < boardSize; j++)
+            // Duration decrease
+            moveUnitDuration -= 1;
+
+            // Set boundary
+            board[moveUnitX][moveUnitY].distance[targetProperty] = 1;
+
+            // Then continue until nothing changes
+            int changeCount = 1;
+            while (changeCount > 0)
             {
-                int property = board[i][j].property;
+                changeCount = 0;
 
-                if (property != targetProperty || !moveable(i, j))
-                    continue;
-
-                // Up
-                if (j < boardSize - 1 && property != board[i][j + 1].property && moveable(i, j + 1))
+                for (int i = 0; i < boardSize; i++)
                 {
-                    board[i][j].distance[targetProperty] = 1;
-                    board[i][j].direction[targetProperty] += "U";
-                }
+                    for (int j = 0; j < boardSize; j++)
+                    {
+                        int property = board[i][j].property;
 
-                // Down
-                if (j > 0 && property != board[i][j - 1].property && moveable(i, j - 1))
-                {
-                    board[i][j].distance[targetProperty] = 1;
-                    board[i][j].direction[targetProperty] += "D";
-                }
+                        if (board[i][j].distance[targetProperty] == 0 && isMovable(i, j))
+                        {
+                            int minDistance = 35;
+                            // Check 4 directions to find out the shortest, then determine the way.
+                            // Up
+                            if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i][j + 1].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "U";
+                                }
+                                else if (minDistance > board[i][j + 1].distance[targetProperty])
+                                {
+                                    minDistance = board[i][j + 1].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "U";
+                                }
+                            }
+                            // Down
+                            if (j > 0 && board[i][j - 1].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i][j - 1].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "D";
+                                }
+                                else if (minDistance > board[i][j - 1].distance[targetProperty])
+                                {
+                                    minDistance = board[i][j - 1].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "D";
+                                }
+                            }
+                            // Right
+                            if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i + 1][j].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "R";
+                                }
+                                else if (minDistance > board[i + 1][j].distance[targetProperty])
+                                {
+                                    minDistance = board[i + 1][j].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "R";
+                                }
+                            }
+                            // Left
+                            if (i > 0 && board[i - 1][j].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i - 1][j].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "L";
+                                }
+                                else if (minDistance > board[i - 1][j].distance[targetProperty])
+                                {
+                                    minDistance = board[i - 1][j].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "L";
+                                }
+                            }
 
-                // Left
-                if (i > 0 && property != board[i - 1][j].property && moveable(i - 1, j))
-                {
-                    board[i][j].distance[targetProperty] = 1;
-                    board[i][j].direction[targetProperty] += "L";
-                }
-
-                // Right
-                if (i < boardSize - 1 && property != board[i + 1][j].property && moveable(i + 1, j))
-                {
-                    board[i][j].distance[targetProperty] = 1;
-                    board[i][j].direction[targetProperty] += "R";
+                            // Update distance
+                            if (minDistance != 35)
+                            {
+                                board[i][j].distance[targetProperty] = minDistance + 1;
+                                changeCount++;
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        // Then continue until nothing changes
-        int changeCount = 1;
-        while (changeCount > 0)
+        else
         {
-            changeCount = 0;
-
+            // Then do the first iteration
             for (int i = 0; i < boardSize; i++)
             {
                 for (int j = 0; j < boardSize; j++)
                 {
                     int property = board[i][j].property;
 
-                    if (property == targetProperty && board[i][j].distance[targetProperty] == 0 && moveable(i, j))
+                    if (property != targetProperty || !isMovable(i, j))
+                        continue;
+
+                    // Up
+                    if (j < boardSize - 1 && property != board[i][j + 1].property && isMovable(i, j + 1))
                     {
+                        board[i][j].distance[targetProperty] = 1;
+                        board[i][j].direction[targetProperty] += "U";
+                    }
+
+                    // Down
+                    if (j > 0 && property != board[i][j - 1].property && isMovable(i, j - 1))
+                    {
+                        board[i][j].distance[targetProperty] = 1;
+                        board[i][j].direction[targetProperty] += "D";
+                    }
+
+                    // Left
+                    if (i > 0 && property != board[i - 1][j].property && isMovable(i - 1, j))
+                    {
+                        board[i][j].distance[targetProperty] = 1;
+                        board[i][j].direction[targetProperty] += "L";
+                    }
+
+                    // Right
+                    if (i < boardSize - 1 && property != board[i + 1][j].property && isMovable(i + 1, j))
+                    {
+                        board[i][j].distance[targetProperty] = 1;
+                        board[i][j].direction[targetProperty] += "R";
+                    }
+                }
+            }
+
+            // Then continue until nothing changes
+            int changeCount = 1;
+            while (changeCount > 0)
+            {
+                changeCount = 0;
+
+                for (int i = 0; i < boardSize; i++)
+                {
+                    for (int j = 0; j < boardSize; j++)
+                    {
+                        int property = board[i][j].property;
+
+                        if (property == targetProperty && board[i][j].distance[targetProperty] == 0 && isMovable(i, j))
+                        {
+                            int minDistance = 35;
+                            // Check 4 directions to find out the shortest, then determine the way.
+                            // Up
+                            if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i][j + 1].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "U";
+                                }
+                                else if (minDistance > board[i][j + 1].distance[targetProperty])
+                                {
+                                    minDistance = board[i][j + 1].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "U";
+                                }
+                            }
+                            // Down
+                            if (j > 0 && board[i][j - 1].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i][j - 1].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "D";
+                                }
+                                else if (minDistance > board[i][j - 1].distance[targetProperty])
+                                {
+                                    minDistance = board[i][j - 1].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "D";
+                                }
+                            }
+                            // Right
+                            if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i + 1][j].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "R";
+                                }
+                                else if (minDistance > board[i + 1][j].distance[targetProperty])
+                                {
+                                    minDistance = board[i + 1][j].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "R";
+                                }
+                            }
+                            // Left
+                            if (i > 0 && board[i - 1][j].distance[targetProperty] != 0)
+                            {
+                                if (minDistance == board[i - 1][j].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "L";
+                                }
+                                else if (minDistance > board[i - 1][j].distance[targetProperty])
+                                {
+                                    minDistance = board[i - 1][j].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "L";
+                                }
+                            }
+
+                            // Update distance
+                            if (minDistance != 35)
+                            {
+                                board[i][j].distance[targetProperty] = minDistance + 1;
+                                changeCount++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Negative iteration
+            changeCount = 1;
+            while (changeCount > 0)
+            {
+                changeCount = 0;
+
+                for (int i = 0; i < boardSize; i++)
+                {
+                    for (int j = 0; j < boardSize; j++)
+                    {
+                        int property = board[i][j].property;
+
+                        if (property != targetProperty && board[i][j].distance[targetProperty] == 0 && isMovable(i, j))
+                        {
+                            int maxDistance = -35;
+
+                            // Check 4 directions to find out the shortest, then determine the way.
+                            // Up
+                            if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
+                            {
+                                if (maxDistance == board[i][j + 1].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "U";
+                                }
+                                else if (maxDistance < board[i][j + 1].distance[targetProperty])
+                                {
+                                    maxDistance = board[i][j + 1].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "U";
+                                }
+                            }
+                            // Down
+                            if (j > 0 && board[i][j - 1].distance[targetProperty] != 0)
+                            {
+                                if (maxDistance == board[i][j - 1].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "D";
+                                }
+                                else if (maxDistance < board[i][j - 1].distance[targetProperty])
+                                {
+                                    maxDistance = board[i][j - 1].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "D";
+                                }
+                            }
+                            // Right
+                            if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
+                            {
+                                if (maxDistance == board[i + 1][j].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "R";
+                                }
+                                else if (maxDistance < board[i + 1][j].distance[targetProperty])
+                                {
+                                    maxDistance = board[i + 1][j].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "R";
+                                }
+                            }
+                            // Left
+                            if (i > 0 && board[i - 1][j].distance[targetProperty] != 0)
+                            {
+                                if (maxDistance == board[i - 1][j].distance[targetProperty])
+                                {
+                                    board[i][j].direction[targetProperty] += "L";
+                                }
+                                else if (maxDistance < board[i - 1][j].distance[targetProperty])
+                                {
+                                    maxDistance = board[i - 1][j].distance[targetProperty];
+                                    board[i][j].direction[targetProperty] = "L";
+                                }
+                            }
+
+                            // Update distance
+                            if (maxDistance != -35)
+                            {
+                                if (maxDistance == 1)
+                                {
+                                    board[i][j].distance[targetProperty] = -1;
+                                }
+                                else
+                                {
+                                    board[i][j].distance[targetProperty] = maxDistance - 1;
+                                }
+
+                                changeCount++;
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            // Now, handle with negative tiles directions.
+            for (int i = 0; i < boardSize; i++)
+            {
+                for (int j = 0; j < boardSize; j++)
+                {
+                    int property = board[i][j].property;
+
+                    if (property != targetProperty)
+                    {
+                        // Check minDistance tiles around it and get the directions
                         int minDistance = 35;
-                        // Check 4 directions to find out the shortest, then determine the way.
+
                         // Up
-                        if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
+                        if (j < 6 && board[i][j + 1].distance[targetProperty] != 0)
                         {
                             if (minDistance == board[i][j + 1].distance[targetProperty])
                             {
@@ -292,7 +550,7 @@ public class GameManager : MonoBehaviour
                             }
                         }
                         // Right
-                        if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
+                        if (i < 6 && board[i + 1][j].distance[targetProperty] != 0)
                         {
                             if (minDistance == board[i + 1][j].distance[targetProperty])
                             {
@@ -318,173 +576,22 @@ public class GameManager : MonoBehaviour
                             }
                         }
 
-                        // Update distance
-                        if (minDistance != 35)
-                        {
-                            board[i][j].distance[targetProperty] = minDistance + 1;
-                            changeCount++;
-                        }
+                        // Updating the distances are enough. quitting.
                     }
                 }
             }
         }
+    }
 
-        // Negative iteration
-        changeCount = 1;
-        while (changeCount > 0)
-        {
-            changeCount = 0;
-
-            for (int i = 0; i < boardSize; i++)
-            {
-                for (int j = 0; j < boardSize; j++)
-                {
-                    int property = board[i][j].property;
-
-                    if (property != targetProperty && board[i][j].distance[targetProperty] == 0 && moveable(i, j))
-                    {
-                        int maxDistance = -35;
-
-                        // Check 4 directions to find out the shortest, then determine the way.
-                        // Up
-                        if (j < boardSize - 1 && board[i][j + 1].distance[targetProperty] != 0)
-                        {
-                            if (maxDistance == board[i][j + 1].distance[targetProperty])
-                            {
-                                board[i][j].direction[targetProperty] += "U";
-                            }
-                            else if (maxDistance < board[i][j + 1].distance[targetProperty])
-                            {
-                                maxDistance = board[i][j + 1].distance[targetProperty];
-                                board[i][j].direction[targetProperty] = "U";
-                            }
-                        }
-                        // Down
-                        if (j > 0 && board[i][j - 1].distance[targetProperty] != 0)
-                        {
-                            if (maxDistance == board[i][j - 1].distance[targetProperty])
-                            {
-                                board[i][j].direction[targetProperty] += "D";
-                            }
-                            else if (maxDistance < board[i][j - 1].distance[targetProperty])
-                            {
-                                maxDistance = board[i][j - 1].distance[targetProperty];
-                                board[i][j].direction[targetProperty] = "D";
-                            }
-                        }
-                        // Right
-                        if (i < boardSize - 1 && board[i + 1][j].distance[targetProperty] != 0)
-                        {
-                            if (maxDistance == board[i + 1][j].distance[targetProperty])
-                            {
-                                board[i][j].direction[targetProperty] += "R";
-                            }
-                            else if (maxDistance < board[i + 1][j].distance[targetProperty])
-                            {
-                                maxDistance = board[i + 1][j].distance[targetProperty];
-                                board[i][j].direction[targetProperty] = "R";
-                            }
-                        }
-                        // Left
-                        if (i > 0 && board[i - 1][j].distance[targetProperty] != 0)
-                        {
-                            if (maxDistance == board[i - 1][j].distance[targetProperty])
-                            {
-                                board[i][j].direction[targetProperty] += "L";
-                            }
-                            else if (maxDistance < board[i - 1][j].distance[targetProperty])
-                            {
-                                maxDistance = board[i - 1][j].distance[targetProperty];
-                                board[i][j].direction[targetProperty] = "L";
-                            }
-                        }
-
-                        // Update distance
-                        if (maxDistance != -35)
-                        {
-                            if (maxDistance == 1)
-                            {
-                                board[i][j].distance[targetProperty] = -1;
-                            }
-                            else
-                            {
-                                board[i][j].distance[targetProperty] = maxDistance - 1;
-                            }
-
-                            changeCount++;
-                        }
-
-                    }
-                }
-            }
-        }
-
-        // Now, handle with negative tiles directions.
+    void TerrainCheck()
+    {
         for (int i = 0; i < boardSize; i++)
         {
             for (int j = 0; j < boardSize; j++)
             {
-                int property = board[i][j].property;
-
-                if (property != targetProperty)
+                if (!isMovable(i, j))
                 {
-                    // Check minDistance tiles around it and get the directions
-                    int minDistance = 35;
-
-                    // Up
-                    if (j < 6 && board[i][j + 1].distance[targetProperty] != 0)
-                    {
-                        if (minDistance == board[i][j + 1].distance[targetProperty])
-                        {
-                            board[i][j].direction[targetProperty] += "U";
-                        }
-                        else if (minDistance > board[i][j + 1].distance[targetProperty])
-                        {
-                            minDistance = board[i][j + 1].distance[targetProperty];
-                            board[i][j].direction[targetProperty] = "U";
-                        }
-                    }
-                    // Down
-                    if (j > 0 && board[i][j - 1].distance[targetProperty] != 0)
-                    {
-                        if (minDistance == board[i][j - 1].distance[targetProperty])
-                        {
-                            board[i][j].direction[targetProperty] += "D";
-                        }
-                        else if (minDistance > board[i][j - 1].distance[targetProperty])
-                        {
-                            minDistance = board[i][j - 1].distance[targetProperty];
-                            board[i][j].direction[targetProperty] = "D";
-                        }
-                    }
-                    // Right
-                    if (i < 6 && board[i + 1][j].distance[targetProperty] != 0)
-                    {
-                        if (minDistance == board[i + 1][j].distance[targetProperty])
-                        {
-                            board[i][j].direction[targetProperty] += "R";
-                        }
-                        else if (minDistance > board[i + 1][j].distance[targetProperty])
-                        {
-                            minDistance = board[i + 1][j].distance[targetProperty];
-                            board[i][j].direction[targetProperty] = "R";
-                        }
-                    }
-                    // Left
-                    if (i > 0 && board[i - 1][j].distance[targetProperty] != 0)
-                    {
-                        if (minDistance == board[i - 1][j].distance[targetProperty])
-                        {
-                            board[i][j].direction[targetProperty] += "L";
-                        }
-                        else if (minDistance > board[i - 1][j].distance[targetProperty])
-                        {
-                            minDistance = board[i - 1][j].distance[targetProperty];
-                            board[i][j].direction[targetProperty] = "L";
-                        }
-                    }
-
-                    // Updating the distances are enough. quitting.
+                    board[i][j].unitCount = 0;
                 }
             }
         }
@@ -544,7 +651,11 @@ public class GameManager : MonoBehaviour
 
     void UpdateUnit(int targetProperty)
     {
-        int threshold = 2;
+        int threshold;
+        if (targetProperty == 1 && moveUnitDuration > 0)
+            threshold = 1;
+        else
+            threshold = 2;
 
         for (int currDistance = 2 * (boardSize - 1); currDistance >= -2 * (boardSize - 1); currDistance--)
         {
@@ -564,6 +675,13 @@ public class GameManager : MonoBehaviour
 
                         int dividend = 0;
                         int divisor = board[i][j].direction[targetProperty].Length;
+
+                        if (divisor == 0)
+                        {
+                            if (board[i][j].unitCount > 4)
+                                board[i][j].unitCount = 4;
+                            continue;
+                        }
 
                         for (int u = 0; u < board[i][j].unitCount && diff > 0; u++)
                         {
@@ -733,7 +851,7 @@ public class GameManager : MonoBehaviour
                             }
                         }
 
-                        // find Next maxRanges
+                        // Find Next maxRanges
                         int newMaxRange = 0;
 
                         for (int p = 0; p < 7; p++)
@@ -829,17 +947,75 @@ public class GameManager : MonoBehaviour
         switch(majorButton)
         {
             case "AbilityButton":
-                break;
+                if (minorButton == "moveUnit")
+                {
+                    gridX = System.Convert.ToInt32(inputs[2]);
+                    gridY = System.Convert.ToInt32(inputs[3]);
+
+                    playerA += cooltimeDictionary["moveUnit"];
+
+                    moveUnitX = gridX;
+                    moveUnitY = gridY;
+                    moveUnitDuration = cooltimeDictionary["moveUnit"];
+                }
+                else if (minorButton == "changeWater") {
+                    gridX = System.Convert.ToInt32(inputs[2]);
+                    gridY = System.Convert.ToInt32(inputs[3]);
+                    
+                    if (board[gridX][gridY].property == 1)
+                    {
+                        bool isEnabled = false;
+                        // Check if the user enabled the ability
+                        for (int i = 0; i < boardSize; i++)
+                        {
+                            for (int j = 0; j < boardSize; j++)
+                            {
+                                if (board[i][j].property == 0 && board[i][j].isBuilt == true && board[i][j].structure.enable == "changeWater")
+                                {
+                                    isEnabled = true;
+                                    break;
+                                }
+                            }
+                            if (isEnabled == true) { break; }
+                        }
+
+                        isEnabled = true;
+
+                        if (isEnabled == true)
+                        {
+                            board[gridX][gridY].terrain = "Water";
+                            boardManager.SendMessage("ChangeTile", gridX.ToString() + "," + gridY.ToString() + "," + "Water");
+                            playerA += cooltimeDictionary["changeWater"];
+                        }
+                        else
+                        {
+                            // You don't have the ability
+                        }
+
+                    }
+                    else
+                    {
+                        // It's not your property
+                    }
+                }
+                    break;
             case "BuildButton":
                 gridX = System.Convert.ToInt32(inputs[2]);
                 gridY = System.Convert.ToInt32(inputs[3]);
-
-                board[gridX][gridY].property = property;
-                board[gridX][gridY].structure.property = property;
-                board[gridX][gridY].structure.buildingType = minorButton;
-                board[gridX][gridY].structure.generate = "Musketeer";
-                board[gridX][gridY].structure.counter = 1;
-                board[gridX][gridY].isBuilt = true;
+                if (board[gridX][gridY].property == 1)
+                {
+                    board[gridX][gridY].property = property;
+                    board[gridX][gridY].structure.property = property;
+                    board[gridX][gridY].structure.buildingType = minorButton;
+                    board[gridX][gridY].structure.generate = "Musketeer";
+                    board[gridX][gridY].structure.counter = 1;
+                    board[gridX][gridY].isBuilt = true;
+                    playerA += cooltimeDictionary["build" + minorButton];
+                }
+                else
+                {
+                    // Send uimanager error message
+                }
 
                 break;
         }
@@ -872,6 +1048,16 @@ public class GameManager : MonoBehaviour
             {"Infantry", 2},
             {"Musketeer", 3}
         };
+
+        cooltimeDictionary = new Dictionary<string, int>()
+        {
+            {"moveUnit", 5},
+            {"changeWater", 5},
+            {"buildPolis", 5},
+            {"buildTemple", 5}
+        };
+
+
 
         InitBoard();
     }

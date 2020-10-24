@@ -52,6 +52,7 @@ public class UserInterfaceManager : MonoBehaviour
         switch (majorButton)
         {
             case "AbilityButton":
+                gameManager.SendMessage("ButtonClicked", majorButton + "," + minorButton + "," + currGridX.ToString() + "," + currGridY.ToString());
                 break;
             case "BuildButton":
                 gameManager.SendMessage("ButtonClicked", majorButton + "," + minorButton + "," + currGridX.ToString() + "," + currGridY.ToString());

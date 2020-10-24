@@ -10,7 +10,7 @@ public class ButtonManager : MonoBehaviour
 
     public GameObject abilityButton;
     public GameObject abilityMoveUnit;
-    public GameObject abilityChangeTile;
+    public GameObject abilityChangeWater;
 
     public GameObject buildButton;
     public GameObject buildPolis;
@@ -22,7 +22,7 @@ public class ButtonManager : MonoBehaviour
     void Start()
     {
         abilityMoveUnit.SetActive(false);
-        abilityChangeTile.SetActive(false);
+        abilityChangeWater.SetActive(false);
 
         buildPolis.SetActive(false);
         buildTemple.SetActive(false);
@@ -85,17 +85,27 @@ public class ButtonManager : MonoBehaviour
         Disappear();
 
         abilityMoveUnit.SetActive(true);
-        abilityChangeTile.SetActive(true);
+        abilityChangeWater.SetActive(true);
     }
 
     public void AbilityMoveUnit()
     {
+        userInterfaceManager.SendMessage("AbilityButton", "moveUnit");
 
+        abilityMoveUnit.SetActive(false);
+        abilityChangeWater.SetActive(false);
+
+        Appear();
     }
 
-    public void AbilityChangeTile()
+    public void AbilityChangeWater()
     {
+        userInterfaceManager.SendMessage("AbilityButton", "changeWater");
 
+        abilityMoveUnit.SetActive(false);
+        abilityChangeWater.SetActive(false);
+
+        Appear();
     }
 
     public void BuildButton()
