@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     int currSeq = 1;
     int prevSeq = 0;
 
-    int playerA = 5;
+    int playerA = 2;
 
     bool isButtonActive = false;
 
@@ -112,7 +112,12 @@ public class GameManager : MonoBehaviour
         }
 
         // Then, place neutral units
-        
+        board[4][4].property = 3;
+        board[4][4].structure.property = 3;
+        board[4][4].structure.buildingType = "Polis";
+        board[4][4].structure.generate = "Musketeer";
+        board[4][4].structure.counter = 1;
+        board[4][4].isBuilt = true;
 
         board[4][4].property = 4;
         board[4][4].structure.property = 4;
@@ -154,18 +159,14 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        UpdateLookupTable(1);
-        UpdateLookupTable(2);
-        UpdateLookupTable(3);
-        UpdateLookupTable(4);
+        for (int p = 1; p <= 4; p++)
+            UpdateLookupTable(p);
 
         GenerateUnit();
         TerrainCheck();
 
-        UpdateUnit(1);
-        UpdateUnit(2);
-        UpdateUnit(3);
-        UpdateUnit(4);
+        for (int p = 1; p <= 4; p++)
+            UpdateUnit(p);
 
         Battlements();
 
@@ -189,14 +190,11 @@ public class GameManager : MonoBehaviour
 
     bool isMovable(int i, int j)
     {
-        //tile is movable if it is not Mountain or Water
+        // Tile is movable only if it is not water tile
         if (board[i][j].terrain == "Water")
-        {
-            //UnityEngine.Debug.Log(i.ToString() + "," + j.ToString() + ", " + board[i][j].terrain + "is not walkable");
             return false;
-        }
-
-        return true;
+        else
+            return true;
     }
 
     void UpdateLookupTable(int targetProperty)
@@ -592,6 +590,7 @@ public class GameManager : MonoBehaviour
                 if (!isMovable(i, j))
                 {
                     board[i][j].unitCount = 0;
+                    board[i][j].isBuilt = false;
                 }
             }
         }
@@ -832,8 +831,12 @@ public class GameManager : MonoBehaviour
                                         continue;
                                     }
 
-                                    // If target is valid, shoot.
+                                    // If target is valid, shoot
                                     int damage = propertyUnit[p][currentIndex].damage;
+                                    if (targetProperty == board[i][j].property && board[i][j].terrain == "Mountain")
+                                    {
+                                        damage -= 1;
+                                    }
                                     propertyUnit[targetProperty][targetIndex].currentHP -= damage;
                                 }
                             }
@@ -847,7 +850,7 @@ public class GameManager : MonoBehaviour
                             for (int index = separateCount[p] - 1; index >= 0; index--)
                             {
                                 // Check if dead, then decrease separateCount
-                                if (propertyUnit[p][index].currentHP <= 0) { separateCount[p] -= 1; UnityEngine.Debug.Log(p.ToString() + " died " + index); }
+                                if (propertyUnit[p][index].currentHP <= 0) { separateCount[p] -= 1; }
                             }
                         }
 
@@ -927,8 +930,14 @@ public class GameManager : MonoBehaviour
                 }
                 if (board[i][j].isBuilt && board[i][j].property != board[i][j].structure.property)
                 {
-                    // Destroy the building
-                    board[i][j].isBuilt = false;
+                    if (board[i][j].structure.buildingType == "Polis")
+                    {
+                        board[i][j].structure.property = board[i][j].property;
+                    }
+                    else
+                    {
+                        board[i][j].isBuilt = false;
+                    }
                 }
             }
         }
@@ -937,40 +946,31 @@ public class GameManager : MonoBehaviour
 
     public void ButtonClicked(string input)
     {
+        if (isButtonActive == false) { return; }
         string[] inputs = input.Split(',');
         string majorButton = inputs[0];
         string minorButton = inputs[1];
-        int gridX, gridY;
 
         int property = 1;
         
         switch(majorButton)
         {
             case "AbilityButton":
-                if (minorButton == "moveUnit")
+            {
+                switch(minorButton)
                 {
-                    gridX = System.Convert.ToInt32(inputs[2]);
-                    gridY = System.Convert.ToInt32(inputs[3]);
-
-                    playerA += cooltimeDictionary["moveUnit"];
-
-                    moveUnitX = gridX;
-                    moveUnitY = gridY;
-                    moveUnitDuration = cooltimeDictionary["moveUnit"];
-                }
-                else if (minorButton == "changeWater") {
-                    gridX = System.Convert.ToInt32(inputs[2]);
-                    gridY = System.Convert.ToInt32(inputs[3]);
-                    
-                    if (board[gridX][gridY].property == 1)
+                    case "moveUnit":
                     {
+                        int gridX, gridY;
+                        gridX = System.Convert.ToInt32(inputs[2]);
+                        gridY = System.Convert.ToInt32(inputs[3]);
                         bool isEnabled = false;
                         // Check if the user enabled the ability
                         for (int i = 0; i < boardSize; i++)
                         {
                             for (int j = 0; j < boardSize; j++)
                             {
-                                if (board[i][j].property == 0 && board[i][j].isBuilt == true && board[i][j].structure.enable == "changeWater")
+                                if (board[i][j].property == 1 && board[i][j].isBuilt == true && board[i][j].structure.enable == "moveUnit")
                                 {
                                     isEnabled = true;
                                     break;
@@ -979,45 +979,273 @@ public class GameManager : MonoBehaviour
                             if (isEnabled == true) { break; }
                         }
 
-                        isEnabled = true;
-
                         if (isEnabled == true)
                         {
-                            board[gridX][gridY].terrain = "Water";
-                            boardManager.SendMessage("ChangeTile", gridX.ToString() + "," + gridY.ToString() + "," + "Water");
-                            playerA += cooltimeDictionary["changeWater"];
+                            playerA += cooltimeDictionary["moveUnit"];
+
+                            moveUnitX = gridX;
+                            moveUnitY = gridY;
+                            moveUnitDuration = cooltimeDictionary["moveUnit"];
                         }
                         else
                         {
                             // You don't have the ability
                         }
-
+                        break;
                     }
-                    else
+                    case "changeWater":
                     {
-                        // It's not your property
+                        int gridX, gridY;
+                        gridX = System.Convert.ToInt32(inputs[2]);
+                        gridY = System.Convert.ToInt32(inputs[3]);
+                        
+                        if (board[gridX][gridY].property == 1)
+                        {
+                            bool isEnabled = false;
+                            // Check if the user enabled the ability
+                            for (int i = 0; i < boardSize; i++)
+                            {
+                                for (int j = 0; j < boardSize; j++)
+                                {
+                                    if (board[i][j].property == 1 && board[i][j].isBuilt == true && board[i][j].structure.enable == "changeWater")
+                                    {
+                                        isEnabled = true;
+                                        break;
+                                    }
+                                }
+                                if (isEnabled == true) { break; }
+                            }
+
+                            if (isEnabled == true)
+                            {
+                                board[gridX][gridY].terrain = "Water";
+                                boardManager.SendMessage("ChangeTile", gridX.ToString() + "," + gridY.ToString() + "," + "Water");
+                                playerA += cooltimeDictionary["changeWater"];
+                            }
+                            else
+                            {
+                                // You don't have the ability
+                            }
+
+                        }
+                        else
+                        {
+                            // It's not your property
+                        }
+                        break;
+                    }
+                    case "changeMountain":
+                    {
+                        int gridX, gridY;
+                        gridX = System.Convert.ToInt32(inputs[2]);
+                        gridY = System.Convert.ToInt32(inputs[3]);
+
+                        if (board[gridX][gridY].property == 1)
+                        {
+                            bool isEnabled = false;
+                            // Check if the user enabled the ability
+                            for (int i = 0; i < boardSize; i++)
+                            {
+                                for (int j = 0; j < boardSize; j++)
+                                {
+                                    if (board[i][j].property == 1 && board[i][j].isBuilt == true && board[i][j].structure.enable == "changeMountain")
+                                    {
+                                        isEnabled = true;
+                                        break;
+                                    }
+                                }
+                                if (isEnabled == true) { break; }
+                            }
+
+                            if (isEnabled == true)
+                            {
+                                board[gridX][gridY].terrain = "Mountain";
+                                boardManager.SendMessage("ChangeTile", gridX.ToString() + "," + gridY.ToString() + "," + "Mountain");
+                                playerA += cooltimeDictionary["changeMountain"];
+                            }
+                            else
+                            {
+                                // You don't have the ability
+                            }
+
+                        }
+                        else
+                        {
+                            // It's not your property
+                        }
+                        break;
+                    }
+                    case "fireBlast":
+                    {
+                        int gridX, gridY;
+                        gridX = System.Convert.ToInt32(inputs[2]);
+                        gridY = System.Convert.ToInt32(inputs[3]);
+
+                        int damage = 50;
+
+                        if (board[gridX][gridY].property != 1)
+                        {
+                            bool isEnabled = false;
+                            // Check if the user enabled the ability
+                            for (int i = 0; i < boardSize; i++)
+                            {
+                                for (int j = 0; j < boardSize; j++)
+                                {
+                                    if (board[i][j].property == 1 && board[i][j].isBuilt == true && board[i][j].structure.enable == "fireBlast")
+                                    {
+                                        isEnabled = true;
+                                        break;
+                                    }
+                                }
+                                if (isEnabled == true) { break; }
+                            }
+
+                            if (isEnabled == true)
+                            {
+                                // Destroy all units
+                                for(int u = 0; u < board[gridX][gridY].unitCount; u++)
+                                    boardManager.SendMessage("DestroyUnit", gridX.ToString() + "," + gridY.ToString() + "," + u.ToString());
+
+                                // Deal certain damage to enemy
+                                for (int i = 0; i < board[gridX][gridY].unitCount; i++)
+                                {
+                                    board[gridX][gridY].units[i].currentHP -= damage;
+                                    if (board[gridX][gridY].units[i].currentHP < 1)
+                                    {
+                                        for (int j = i + 1; j < board[gridX][gridY].unitCount; j++)
+                                        {
+                                            board[gridX][gridY].units[j - 1] = board[gridX][gridY].units[j];
+                                        }
+                                        board[gridX][gridY].unitCount -= 1;
+                                        i -= 1;
+                                    }
+                                }
+                                playerA += cooltimeDictionary["fireBlast"];
+                            }
+                            else
+                            {
+                                // You don't have the ability
+                            }
+                        }
+                        else
+                        {
+                            // It's not your property
+                        }
+                        break;
                     }
                 }
-                    break;
+                break;
+            }
             case "BuildButton":
+            {
+                int gridX, gridY;
                 gridX = System.Convert.ToInt32(inputs[2]);
                 gridY = System.Convert.ToInt32(inputs[3]);
-                if (board[gridX][gridY].property == 1)
+
+                if (board[gridX][gridY].property == 1 && !board[gridX][gridY].isBuilt)
                 {
-                    board[gridX][gridY].property = property;
-                    board[gridX][gridY].structure.property = property;
-                    board[gridX][gridY].structure.buildingType = minorButton;
-                    board[gridX][gridY].structure.generate = "Musketeer";
-                    board[gridX][gridY].structure.counter = 1;
-                    board[gridX][gridY].isBuilt = true;
+                    switch(minorButton)
+                    {
+                        case "Polis":
+                        {
+                            // Check if there is more than one Infantry Polis
+                            int count = 0;
+                            for (int i = 0; i < boardSize; i++)
+                            {
+                                for (int j = 0; j < boardSize; j++)
+                                {
+                                    if (board[i][j].property == 1 && board[i][j].isBuilt
+                                        && board[i][j].structure.buildingType == "Polis"
+                                        && board[i][j].structure.generate == "Infantry")
+                                    {
+                                        count += 1;
+                                    }
+                                }
+                            }
+
+                            if (count < 2)
+                            {
+                                board[gridX][gridY].isBuilt = true;
+                                board[gridX][gridY].property = property;
+                                board[gridX][gridY].structure.property = property;
+                                board[gridX][gridY].structure.buildingType = minorButton;
+                                board[gridX][gridY].structure.generate = "Infantry";
+                                board[gridX][gridY].structure.counter = 1;
+                            }
+
+                            break;
+                        }
+                        case "templeWater":
+                        {
+                            board[gridX][gridY].structure.enable = "changeWater";
+                            board[gridX][gridY].property = property;
+                            board[gridX][gridY].structure.property = property;
+                            board[gridX][gridY].structure.buildingType = minorButton;
+                            board[gridX][gridY].isBuilt = true;
+                            break;
+                        }
+                        case "templeFire":
+                        {
+                            board[gridX][gridY].structure.enable = "fireBlast";
+                            board[gridX][gridY].property = property;
+                            board[gridX][gridY].structure.property = property;
+                            board[gridX][gridY].structure.buildingType = minorButton;
+                            board[gridX][gridY].isBuilt = true;
+                            break;
+                        }
+                        case "templeRock":
+                        {
+                            board[gridX][gridY].structure.enable = "changeMountain";
+                            board[gridX][gridY].property = property;
+                            board[gridX][gridY].structure.property = property;
+                            board[gridX][gridY].structure.buildingType = minorButton;
+                            board[gridX][gridY].isBuilt = true;
+                            break;
+                        }
+                        case "standingStones":
+                        {
+                            board[gridX][gridY].structure.enable = "moveUnit";
+                            board[gridX][gridY].property = property;
+                            board[gridX][gridY].structure.property = property;
+                            board[gridX][gridY].structure.buildingType = minorButton;
+                            board[gridX][gridY].isBuilt = true;
+                            break;
+                        }
+                        default:
+                        {
+                            board[gridX][gridY].structure.enable = "none";
+                            board[gridX][gridY].property = property;
+                            board[gridX][gridY].structure.property = property;
+                            board[gridX][gridY].structure.buildingType = minorButton;
+                            board[gridX][gridY].isBuilt = true;
+                            break;
+                        }
+                    }
+                    
                     playerA += cooltimeDictionary["build" + minorButton];
                 }
                 else
                 {
                     // Send uimanager error message
                 }
-
                 break;
+            }
+            case "ExtraButton":
+            {
+                switch(minorButton)
+                {
+                    case "skipTurn":
+                    {
+                        playerA += 1;
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+                break;
+            }
         }
 
         // Deactivate button
@@ -1053,11 +1281,14 @@ public class GameManager : MonoBehaviour
         {
             {"moveUnit", 5},
             {"changeWater", 5},
+            {"changeMountain", 5},
+            {"fireBlast", 5},
             {"buildPolis", 5},
-            {"buildTemple", 5}
+            {"buildtempleWater", 5},
+            {"buildtempleFire", 5},
+            {"buildtempleRock", 5},
+            {"buildstandingStones", 5}
         };
-
-
 
         InitBoard();
     }
@@ -1170,7 +1401,7 @@ public struct GameStructure
     public int property;
 
     public string buildingType;
-    
+
     public string generate;
     public int counter;
     public string enable;

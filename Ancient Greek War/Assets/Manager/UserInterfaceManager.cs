@@ -40,7 +40,10 @@ public class UserInterfaceManager : MonoBehaviour
 
     public void ExtraButton(string input)
     {
+        majorButton = "ExtraButton";
+        minorButton = input;
 
+        gameManager.SendMessage("ButtonClicked", majorButton + "," + minorButton);
     }
 
     public void GetMouseInput(string input)

@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
 {
-    public GameObject TemplePrefab;
+    public GameObject prefabCastle1;
+    public GameObject prefabCastle2;
+    public GameObject prefabCastle3;
+    public GameObject prefabNecroCastle;
+    public GameObject prefabStandingStones;
+    public GameObject prefabTempleWater;
+    public GameObject prefabTempleFire;
+    public GameObject prefabTempleRock;
 
     // Start is called before the first frame update
     void Start()
@@ -56,18 +63,52 @@ public class BuildingManager : MonoBehaviour
         switch(buildingType)
         {
             case "Polis":
-            case "Temple":
                 {
-                    newObject = Instantiate(TemplePrefab, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    switch(property)
+                    {
+                        case 1:
+                            newObject = Instantiate(prefabCastle1, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                            break;
+                        case 2:
+                            newObject = Instantiate(prefabNecroCastle, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                            break;
+                        case 3:
+                            newObject = Instantiate(prefabCastle2, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                            break;
+                        case 4:
+                            newObject = Instantiate(prefabCastle3, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                            break;
+                    }
+                    break;
+                }
+            case "templeWater":
+                {
+                    newObject = Instantiate(prefabTempleWater, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    break;
+                }
+            case "templeFire":
+                {
+                    newObject = Instantiate(prefabTempleFire, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    break;
+                }
+            case "templeRock":
+                {
+                    newObject = Instantiate(prefabTempleRock, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    break;
+                }
+            case "standingStones":
+                {
+                    newObject = Instantiate(prefabStandingStones, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
                     break;
                 }
             default:
                 {
-                    newObject = Instantiate(TemplePrefab, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
+                    newObject = Instantiate(prefabStandingStones, new Vector3(targetX, targetY, -0.5f), Quaternion.identity);
                     break;
                 }
         }
 
+        /*
         switch (property)
         {
             case 1:
@@ -101,6 +142,7 @@ public class BuildingManager : MonoBehaviour
                     break;
                 }
         }
+        */
     }
 
     public void DestroyBuilding(string input)
