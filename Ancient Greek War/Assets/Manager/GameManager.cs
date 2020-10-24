@@ -25,7 +25,6 @@ public class GameManager : MonoBehaviour
     int playerA = 5;
     bool isButtonActive = false;
 
-
     void InitBoard()
     {
         turn = 0;
