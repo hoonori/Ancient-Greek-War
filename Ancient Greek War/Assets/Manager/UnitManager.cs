@@ -97,32 +97,32 @@ public class UnitManager : MonoBehaviour
         {
             case 1:
                 {
-                    newObject.GetComponent<Renderer>().material.color = Color.red;
+                    newObject.transform.Find("Character").Find("Body").Find("Head").Find("Hair").GetComponent<SpriteRenderer>().color = Color.red;
                     break;
                 }
             case 2:
                 {
-                    newObject.GetComponent<Renderer>().material.color = Color.blue;
+                    newObject.transform.Find("Character").Find("Body").Find("Head").Find("Hair").GetComponent<SpriteRenderer>().color = Color.blue;
                     break;
                 }
             case 3:
                 {
-                    newObject.GetComponent<Renderer>().material.color = Color.yellow;
+                    newObject.transform.Find("Character").Find("Body").Find("Head").Find("Hair").GetComponent<SpriteRenderer>().color = Color.green;
                     break;
                 }
             case 4:
                 {
-                    newObject.GetComponent<Renderer>().material.color = Color.green;
+                    newObject.transform.Find("Character").Find("Body").Find("Head").Find("Hair").GetComponent<SpriteRenderer>().color = Color.yellow;
                     break;
                 }
             case 5:
                 {
-                    newObject.GetComponent<Renderer>().material.color = Color.white;
+                    newObject.transform.Find("Character").Find("Body").Find("Head").Find("Hair").GetComponent<SpriteRenderer>().color = Color.black;
                     break;
                 }
             case 6:
                 {
-                    newObject.GetComponent<Renderer>().material.color = Color.black;
+                    newObject.transform.Find("Character").Find("Body").Find("Head").Find("Hair").GetComponent<SpriteRenderer>().color = Color.white;
                     break;
                 }
         }
@@ -227,7 +227,7 @@ public class UnitManager : MonoBehaviour
             return;
         }
 
-        currObject.SendMessage("SetHealth", currHealth);
+        // currObject.SendMessage("SetUnitHealth", currHealth);
     }
 
     // Input should be "x,y,index" where curr grid and next grid.

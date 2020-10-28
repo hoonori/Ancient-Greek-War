@@ -78,7 +78,7 @@ public class UnitScript : MonoBehaviour
         targetY = 2.5f * (float)gridY + yOffset * 0.625f;
     }
 
-    public void SetHealth(string input)
+    public void SetUnitHealth(string input)
     {
         targetHealth = (float) System.Convert.ToSingle(input);
     }

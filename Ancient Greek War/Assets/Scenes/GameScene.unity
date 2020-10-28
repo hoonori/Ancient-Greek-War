@@ -1367,9 +1367,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa91560d16f445deb20725c0430b615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InfantryPrefab: {fileID: 2209237377679087242, guid: 05560ed7ebbd68a4885cc3f778fa2042,
+  InfantryPrefab: {fileID: 6395149376837500353, guid: 847f63bd38096ae4c8137d1d4fbdded4,
     type: 3}
-  MusketeerPrefab: {fileID: 7011064589909623257, guid: 132d4a0b9b0b0814585d1821f2258c1a,
+  MusketeerPrefab: {fileID: 1677560305715208483, guid: 8501beefa2f1d724188edf8468023c56,
     type: 3}
 --- !u!4 &502891713
 Transform:
