@@ -38,9 +38,17 @@ public class UserInterfaceManager : MonoBehaviour
         TurnOnMouseInput();
     }
 
-    public void ExtraButton(string input)
+    public void MenuButton(string input)
     {
-        majorButton = "ExtraButton";
+        majorButton = "MenuButton";
+        minorButton = input;
+
+        gameManager.SendMessage("ButtonClicked", majorButton + "," + minorButton);
+    }
+
+    public void SkipButton(string input)
+    {
+        majorButton = "SkipButton";
         minorButton = input;
 
         gameManager.SendMessage("ButtonClicked", majorButton + "," + minorButton);

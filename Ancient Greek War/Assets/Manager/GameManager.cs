@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Diagnostics;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Diagnostics;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class GameManager : MonoBehaviour
     int currSeq = 1;
     int prevSeq = 0;
 
-    int playerA = 2;
+    int playerA = 5;
 
     bool isButtonActive = false;
 
@@ -1230,20 +1231,14 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             }
-            case "ExtraButton":
+            case "MenuButton":
             {
-                switch(minorButton)
-                {
-                    case "skipTurn":
-                    {
-                        playerA += 1;
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
+                SceneManager.LoadScene("MainScene");
+                break;
+            }
+            case "SkipButton":
+            {
+                playerA += 1;
                 break;
             }
         }

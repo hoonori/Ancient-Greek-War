@@ -21,8 +21,11 @@ public class ButtonManager : MonoBehaviour
     public GameObject buildTempleRock;
     public GameObject buildStandingStones;
 
-    public GameObject extraButton;
-    public GameObject extraSkipTurn;
+    public GameObject skipButton;
+
+    public GameObject menuButton;
+
+    public GameObject backButton;
 
     // Start is called before the first frame update
     void Start()
@@ -38,7 +41,7 @@ public class ButtonManager : MonoBehaviour
         buildTempleRock.SetActive(false);
         buildStandingStones.SetActive(false);
 
-        extraSkipTurn.SetActive(false);
+        backButton.SetActive(false);
     }
 
     // Update is called once per frame
@@ -57,8 +60,11 @@ public class ButtonManager : MonoBehaviour
             case "Build":
                 buildButton.GetComponent<Button>().interactable = true;
                 break;
-            case "Extra":
-                extraButton.GetComponent<Button>().interactable = true;
+            case "Skip":
+                skipButton.GetComponent<Button>().interactable = true;
+                break;
+            case "Menu":
+                menuButton.GetComponent<Button>().interactable = true;
                 break;
         }
     }
@@ -73,8 +79,11 @@ public class ButtonManager : MonoBehaviour
             case "Build":
                 buildButton.GetComponent<Button>().interactable = false;
                 break;
-            case "Extra":
-                extraButton.GetComponent<Button>().interactable = false;
+            case "Skip":
+                skipButton.GetComponent<Button>().interactable = false;
+                break;
+            case "Menu":
+                menuButton.GetComponent<Button>().interactable = false;
                 break;
         }
     }
@@ -83,24 +92,30 @@ public class ButtonManager : MonoBehaviour
     {
         abilityButton.SetActive(true);
         buildButton.SetActive(true);
-        extraButton.SetActive(true);
+        skipButton.SetActive(true);
+        menuButton.SetActive(true);
     }
 
     public void Disappear()
     {
         abilityButton.SetActive(false);
         buildButton.SetActive(false);
-        extraButton.SetActive(false);
+        skipButton.SetActive(false);
+        menuButton.SetActive(false);
     }
 
     public void AbilityButton()
     {
         Disappear();
+        abilityButton.SetActive(true);
+        TurnOff("Ability");
 
         abilityMoveUnit.SetActive(true);
         abilityChangeWater.SetActive(true);
         abilityChangeMountain.SetActive(true);
         abilityFireBlast.SetActive(true);
+
+        backButton.SetActive(true);
     }
 
     public void AbilityMoveUnit()
@@ -112,7 +127,10 @@ public class ButtonManager : MonoBehaviour
         abilityChangeMountain.SetActive(false);
         abilityFireBlast.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Ability");
     }
 
     public void AbilityChangeWater()
@@ -124,7 +142,10 @@ public class ButtonManager : MonoBehaviour
         abilityChangeMountain.SetActive(false);
         abilityFireBlast.SetActive(false);
 
+        backButton.SetActive(false);
+        
         Appear();
+        TurnOn("Ability");
     }
 
     public void AbilityChangeMountain()
@@ -136,7 +157,10 @@ public class ButtonManager : MonoBehaviour
         abilityChangeMountain.SetActive(false);
         abilityFireBlast.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Ability");
     }
 
     public void AbilityFireBlast()
@@ -148,18 +172,25 @@ public class ButtonManager : MonoBehaviour
         abilityChangeMountain.SetActive(false);
         abilityFireBlast.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Ability");
     }
 
     public void BuildButton()
     {
         Disappear();
+        buildButton.SetActive(true);
+        TurnOff("Build");
 
         buildPolis.SetActive(true);
         buildTempleWater.SetActive(true);
         buildTempleFire.SetActive(true);
         buildTempleRock.SetActive(true);
         buildStandingStones.SetActive(true);
+
+        backButton.SetActive(true);
     }
 
     public void BuildPolis()
@@ -172,7 +203,10 @@ public class ButtonManager : MonoBehaviour
         buildTempleRock.SetActive(false);
         buildStandingStones.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Build");
     }
 
     public void BuildTempleWater()
@@ -185,7 +219,10 @@ public class ButtonManager : MonoBehaviour
         buildTempleRock.SetActive(false);
         buildStandingStones.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Build");
     }
 
     public void BuildTempleFire()
@@ -198,7 +235,10 @@ public class ButtonManager : MonoBehaviour
         buildTempleRock.SetActive(false);
         buildStandingStones.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Build");
     }
 
     public void BuildTempleRock()
@@ -211,7 +251,10 @@ public class ButtonManager : MonoBehaviour
         buildTempleRock.SetActive(false);
         buildStandingStones.SetActive(false);
 
+        backButton.SetActive(false);
+
         Appear();
+        TurnOn("Build");
     }
 
     public void BuildStandingStones()
@@ -224,22 +267,39 @@ public class ButtonManager : MonoBehaviour
         buildTempleRock.SetActive(false);
         buildStandingStones.SetActive(false);
 
-        Appear();   
-    }
-
-    public void ExtraButton()
-    {
-        Disappear();
-        
-        extraSkipTurn.SetActive(true);
-    }
-
-    public void ExtraSkipTurn()
-    {
-        userInterfaceManager.SendMessage("ExtraButton", "skipTurn");
-
-        extraSkipTurn.SetActive(false);
+        backButton.SetActive(false);
 
         Appear();
+        TurnOn("Build");
+    }
+
+    public void BackButton()
+    {
+        abilityMoveUnit.SetActive(false);
+        abilityChangeWater.SetActive(false);
+        abilityChangeMountain.SetActive(false);
+        abilityFireBlast.SetActive(false);
+        TurnOn("Ability");
+
+        buildPolis.SetActive(false);
+        buildTempleWater.SetActive(false);
+        buildTempleFire.SetActive(false);
+        buildTempleRock.SetActive(false);
+        buildStandingStones.SetActive(false);
+        TurnOn("Build");
+
+        backButton.SetActive(false);
+
+        Appear();
+    }
+
+    public void MenuButton()
+    {
+        userInterfaceManager.SendMessage("MenuButton", "");
+    }
+
+    public void SkipButton()
+    {
+        userInterfaceManager.SendMessage("SkipButton", "");
     }
 }
